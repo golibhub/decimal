@@ -153,13 +153,17 @@ func (d Decimal) DivPrecision(d2 Decimal, precision uint32) Decimal {
 func (d Decimal) Round(n uint16) Decimal {
 	d.ensureInitialized()
 
-	var res apd.Decimal
-	c, err := apd.BaseContext.Quantize(&res, d.v, -int32(n))
+	if uint16(d.DigitsAfterPeriod()) <= n {
+		return d
+	}
+
+	res := apd.New(0, 0)
+	c, err := apd.BaseContext.WithPrecision(uint32(d.v.NumDigits())).Quantize(res, d.v, -int32(n))
 	if err != nil {
 		panic(fmt.Sprintf("fialed to round %s to %d digits after 0; Err: %v; apd.Condition: %v", d.v.String(), n, err, c))
 	}
 
-	return Decimal{v: &res}
+	return Decimal{v: res}
 }
 
 // Reduce removes all the trailing zeroes from the decimal.
@@ -260,6 +264,13 @@ func (d Decimal) Float64() (float64, error) {
 	d.ensureInitialized()
 
 	return d.v.Float64()
+}
+
+// DigitsAfterPeriod returns number of digits after the period.
+func (d Decimal) DigitsAfterPeriod() int {
+	d.ensureInitialized()
+
+	return int(-d.v.Exponent)
 }
 
 // MustFloat64 returns the float64 representation of the decimal.

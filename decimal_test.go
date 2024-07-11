@@ -140,7 +140,13 @@ func TestDecimal(t *testing.T) {
 		assert.Equal(t, "1.234568", d.Round(6).String())
 		assert.Equal(t, "1.2345679", d.Round(7).String())
 		assert.Equal(t, "1.23456789", d.Round(8).String())
-		assert.Equal(t, "1.234567890", d.Round(9).String())
+		assert.Equal(t, "1.23456789", d.Round(9).String())
+	})
+
+	t.Run("Round - no digits after period", func(t *testing.T) {
+		d := decimal.MustFromStr("1")
+
+		assert.Equal(t, "1", d.Round(10).String())
 	})
 
 	t.Run("RoundOrNil", func(t *testing.T) {
@@ -156,7 +162,7 @@ func TestDecimal(t *testing.T) {
 		assert.Equal(t, "1.234568", d.RoundOrNil(6).String())
 		assert.Equal(t, "1.2345679", d.RoundOrNil(7).String())
 		assert.Equal(t, "1.23456789", d.RoundOrNil(8).String())
-		assert.Equal(t, "1.234567890", d.RoundOrNil(9).String())
+		assert.Equal(t, "1.23456789", d.RoundOrNil(9).String())
 	})
 
 	t.Run("InRangeInt", func(t *testing.T) {
